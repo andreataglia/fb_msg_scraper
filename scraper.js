@@ -6,19 +6,11 @@
  *
  */
 const puppeteer = require('puppeteer');
+const Chat = require('./chat.js');
+const Utils = require('./utils.js');
 
-function delay(time) {
-    return new Promise(function(resolve) {
-        setTimeout(resolve, time)
-    });
-}
-
-function divChild(element, child) {
-    return element + ' > div:nth-child(' + child + ')';
-}
-
+//Core
 (async () => {
-    const CHATS_NUMBER = 10;
     const browser = await puppeteer.launch({
         headless: false
     })
@@ -52,8 +44,12 @@ function divChild(element, child) {
     //trova il selettore ma non ci clicca...
     await page.waitForSelector(principaleDiv);
     console.log("clicking on Pincipale to switch to Archivio... 2 times as i need to screw the notification black screen");
-    await page.click(principaleDiv, { delay: 500 });
-    await page.click(principaleDiv, { delay: 500 });
+    await page.click(principaleDiv, {
+        delay: 500
+    });
+    await page.click(principaleDiv, {
+        delay: 500
+    });
     let archivioLink = "#u_0_u > div > div > div > table > tbody > tr > td._10uf._1-9p._51m-.vTop > div > div > div._4u-c > div > div._3xcw > div:nth-child(2)";
     await page.waitForSelector(archivioLink);
     try {
@@ -68,7 +64,7 @@ function divChild(element, child) {
     //Open specific chat
     try {
         console.log('clicking on chatList item 2');
-        await page.click(divChild(chatList, 6));
+        await page.click(Utils.divChild(chatList, 6));
     } catch (err) {
         console.log('couldn\'t click on chat list item >>>> ' + err);
     }
@@ -76,61 +72,8 @@ function divChild(element, child) {
     const chatMsgs = "#u_0_u > div > div > div > table > tbody > tr > td._3q3y._51mw._51m-.vTop > div > div._6skv._4bl9 > div._2evr > div > div:nth-child(1) > div > div > div.uiScrollableAreaWrap.scrollable > div > div > div > div > div";
     await page.waitForSelector(chatMsgs);
 
-    //Scroll up the chat multiple times to make sure it loads all the messages
-    let i = 5;
-    while (i > 0) {
-        await page.evaluate(selector => {
-            document.querySelector(selector).scrollBy(0, -10000);
-        }, "#u_0_u > div > div > div > table > tbody > tr > td._3q3y._51mw._51m-.vTop > div > div._6skv._4bl9 > div._2evr > div > div:nth-child(1) > div > div > div.uiScrollableAreaWrap.scrollable");
-        await delay(500);
-        i--;
-    }
-    console.log('scrolled all the way up...')
+    await Chat.extractChatInfo(page, chatMsgs);
 
-    //Fetch chat info
-    let text = await page.$eval(divChild(chatMsgs, 1) + ' time', (element) => {
-        return element.innerHTML
-    })
-    console.log('>>> First message time: ' + text);
-
-    text = await page.$eval(divChild(chatMsgs, 2) + ' span', (element) => {
-        return element.innerHTML
-    })
-    console.log('>>> First message text: ' + text);
-
-    text = await page.$eval("#u_0_u > div > div > div > table > tbody > tr > td._3q3y._51mw._51m-.vTop > div > div._6skv._4bl9 > div._2evs > div > div > div._4bl9 > div > div > div._iyo > div", (element) => {
-        return element.innerHTML
-    })
-    console.log('>>> Client Name: ' + text);
-    let isVISmsg = false;
-    i = 3;
-    //Search for response time. cannot have more than 20 messages without finding the right response
-    while (!isVISmsg && i < 20) {
-        try {
-            text = await page.$eval(divChild(chatMsgs, i) + ' > div > div > div > div', (element) => {
-                return element.getAttribute('data-tooltip-position')
-            })
-            if (text != null && text == 'right') {
-                text = await page.$eval(divChild(chatMsgs, i) + ' span', (element) => {
-                    return element.innerHTML
-                })
-                words = text.split(' ');
-                //check the message is not the automatic one
-                if (words.length == 34 && words[5] == 'contattato.') {
-                    //just keep going
-                    isVISmsg = false;
-                } else {
-                    isVISmsg = true;
-                    //fetch time
-                    text = await page.$eval(divChild(chatMsgs, i) + ' > div > div > div > div', (element) => {
-                        return element.getAttribute('data-tooltip-content')
-                    })
-                    console.log('>>> Response Time: ' + text);
-                }
-            }
-        } catch (e) {  }
-        i++;
-    }
 
     // browser.close()
     console.log('Finished');
