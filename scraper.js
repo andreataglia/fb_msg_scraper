@@ -93,7 +93,7 @@ function divChild(element, child) {
     })
     console.log('>>> First message time: ' + text);
 
-    text = await page.$eval(divChild(chatMsgs, 2), (element) => {
+    text = await page.$eval(divChild(chatMsgs, 2) + ' span', (element) => {
         return element.innerHTML
     })
     console.log('>>> First message text: ' + text);
@@ -102,31 +102,36 @@ function divChild(element, child) {
         return element.innerHTML
     })
     console.log('>>> Client Name: ' + text);
-    let clientFirstName = text.split(' ')[0];
     let isVISmsg = false;
     i = 3;
-    //cannot have more than 20 messages without response
+    //Search for response time. cannot have more than 20 messages without finding the right response
     while (!isVISmsg && i < 20) {
-        text = await page.$eval(divChild(chatMsgs, i) + ' > div > div > div > div', (element) => {
-            return element.getAttribute('data-tooltip-position')
-        })
-        if (text == 'right') {
-            text = await page.$eval(divChild(chatMsgs, i) + ' span', (element) => {
-                return element.innerHTML
+        try {
+            text = await page.$eval(divChild(chatMsgs, i) + ' > div > div > div > div', (element) => {
+                return element.getAttribute('data-tooltip-position')
             })
-            words = text.split(' ');
-            console.log(words.length);
-            console.log(words[5]);
-            //check the message is not the automatic one
-            if (words.length == 34 && words[5] == 'contattato.') {
-                continue;
-            } else {
-            	isVISmsg = true;	
+            if (text != null && text == 'right') {
+                text = await page.$eval(divChild(chatMsgs, i) + ' span', (element) => {
+                    return element.innerHTML
+                })
+                words = text.split(' ');
+                //check the message is not the automatic one
+                if (words.length == 34 && words[5] == 'contattato.') {
+                    //just keep going
+                    isVISmsg = false;
+                } else {
+                    isVISmsg = true;
+                    //fetch time
+                    text = await page.$eval(divChild(chatMsgs, i) + ' > div > div > div > div', (element) => {
+                        return element.getAttribute('data-tooltip-content')
+                    })
+                    console.log('>>> Response Time: ' + text);
+                }
             }
-        }
+        } catch (e) {  }
         i++;
     }
 
     // browser.close()
-    console.log('Finished')
+    console.log('Finished');
 })()
