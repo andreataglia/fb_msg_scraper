@@ -54,7 +54,7 @@ const Utils = require('./utils.js');
     try {
         await page.click(archivioLink);
     } catch (err) {
-        console.log('couldn\'t click on archivioLink >>>> ' + err);
+        console.error('couldn\'t click on archivioLink >>>> ' + err);
     }
 
     const chatList = "#u_0_u > div > div > div > table > tbody > tr > td._10uf._1-9p._51m-.vTop > div > div > div._29xb > div > div > div > div:nth-child(2) > div";
@@ -72,7 +72,7 @@ const Utils = require('./utils.js');
                 delay: 200
             });
         } catch (err) {
-            console.log('couldn\'t click on chat list item >>>> ' + err);
+            console.error('couldn\'t click on chat list item >>>> ' + err);
         }
         await page.waitForSelector(chatMsgs);
         await page.waitForSelector(spostaInPrincipale);
@@ -86,7 +86,8 @@ const Utils = require('./utils.js');
     }
 
     //once finished scraping put the conversations back into Archive
-    console.log('Finishced scraping. Putting chats back in Archive...');
+    console.log('Done scraping. Printing Csv and putting chats back in Archive...');
+    Chat.printCsv();
     await page.click(principaleDiv, {
         delay: 500
     });
@@ -110,7 +111,7 @@ const Utils = require('./utils.js');
                 delay: 200
             })
         } catch (err) {
-            console.log('couldn\'t click on chat, it is over. (error suppressed)' + err);
+            console.warn('couldn\'t click on chat, it is over.' + err);
             moreChats = false;
         }
     }

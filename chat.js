@@ -1,5 +1,38 @@
 const puppeteer = require('puppeteer');
 const Utils = require('./utils.js');
+const CsvFile = require('./csvFile.js');
+
+let csvObj = {
+    headers: ['Name', 'Subject', 'Weeks_from_D', 'Macro_Activities_Survey', 'Macro_Activities_Actual', 'Product', 'VIS_No_Yes_Interested', 'Macro_Sherpa', 'Sherpa_CAT_1', 'Sherpa_CAT_2', 'N_Subject', 'BF', 'Request_Date', 'Request_Time', 'Response_Day', 'Response_Time', 'Time_to_Response', 'Notes'],
+    data: []
+};
+
+function rowToCsv(name, subject, bf, firstMsgTime, responseTime) {
+    csvObj.data.push({
+        Name: name,
+        Subject: subject,
+        Weeks_from_D: '',
+        Macro_Activities_Survey: '',
+        Macro_Activities_Actual: '',
+        Product: '',
+        VIS_No_Yes_Interested: '',
+        Macro_Sherpa: '',
+        Sherpa_CAT_1: '',
+        Sherpa_CAT_2: '',
+        N_Subject: '',
+        BF: bf,
+        Request_Date: '',
+        Request_Time: '',
+        Response_Day: '',
+        Response_Time: '',
+        Time_to_Response: '',
+        Notes: ''
+    });
+}
+
+function printCsv(){
+    CsvFile.printCsv(csvObj);
+}
 
 function isOurNonAutomaticMsg(el) {
     if (el.includes('data-tooltip-position="right"')) {
@@ -27,6 +60,7 @@ function isClientMsg(el) {
 }
 
 async function extractChatInfo(page, chatMsgs) {
+    let data = {};
     //Scroll up the chat multiple times to make sure it loads all the messages
     let i = 5;
     while (i > 0) {
@@ -42,6 +76,7 @@ async function extractChatInfo(page, chatMsgs) {
         return element.innerHTML
     })
     console.log('>>> First message time: ' + text);
+    data.firstMsgTime = text;
 
     try {
         text = await page.$eval(Utils.divChild(chatMsgs, 2) + ' span', (element) => {
@@ -52,14 +87,16 @@ async function extractChatInfo(page, chatMsgs) {
         text = '<emoticon>';
     }
     console.log('>>> First message text: ' + text);
+    data.subject = text;
 
     text = await page.$eval("#u_0_u > div > div > div > table > tbody > tr > td._3q3y._51mw._51m-.vTop > div > div._6skv._4bl9 > div._2evs > div > div > div._4bl9 > div > div > div._iyo > div", (element) => {
         return element.innerHTML
     })
     console.log('>>> Client Name: ' + text);
+    data.name = text;
     let isVISmsg = false;
     i = 3;
-    //Search for response time. cannot have more than 20 messages without finding the right response
+    //Search for _. cannot have more than 20 messages without finding the right response
     while (!isVISmsg && i < 20) {
         try {
             let element = await page.$eval(Utils.divChild(chatMsgs, i), (el) => {
@@ -73,6 +110,7 @@ async function extractChatInfo(page, chatMsgs) {
                     // return element.innerHTML
                 })
                 console.log('>>> Response Time: ' + text);
+                data.responseTime = text;
             }
 
         } catch (e) {
@@ -108,7 +146,11 @@ async function extractChatInfo(page, chatMsgs) {
         i++;
     }
     console.log('>>> B/F: ' + bf);
+    data.bf = bf;
+
+    rowToCsv(data.name, data.subject, data.bf, data.firstMsgTime, data.responseTime);
 }
 
 
 exports.extractChatInfo = extractChatInfo;
+exports.printCsv = printCsv;
