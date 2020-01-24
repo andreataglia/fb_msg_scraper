@@ -36,7 +36,6 @@ async function extractChatInfo(page, chatMsgs) {
         await Utils.delay(500);
         i--;
     }
-    console.log('scrolled all the way up...')
 
     //Fetch chat info
     let text = await page.$eval(Utils.divChild(chatMsgs, 1) + ' time', (element) => {
@@ -44,9 +43,14 @@ async function extractChatInfo(page, chatMsgs) {
     })
     console.log('>>> First message time: ' + text);
 
-    text = await page.$eval(Utils.divChild(chatMsgs, 2) + ' span', (element) => {
-        return element.innerHTML
-    })
+    try {
+        text = await page.$eval(Utils.divChild(chatMsgs, 2) + ' span', (element) => {
+            return element.innerHTML
+        })
+    } catch (e) {
+        //if it throws error usually is because a like emoticon has been sent
+        text = '<emoticon>';
+    }
     console.log('>>> First message text: ' + text);
 
     text = await page.$eval("#u_0_u > div > div > div > table > tbody > tr > td._3q3y._51mw._51m-.vTop > div > div._6skv._4bl9 > div._2evs > div > div > div._4bl9 > div > div > div._iyo > div", (element) => {
