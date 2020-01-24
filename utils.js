@@ -20,10 +20,10 @@ function toDateTime(str) {
         time: '??'
     }
     if (str.length > 15) {
-        //like: 14 GEN 2020, 22:30
+        //like: 14 GEN 2020, 22:30 or 14 gennaio 2020 22:30 
         let date = str.substr(0, str.length - 6);
         let dateMM = '';
-        switch (date.substr(3, 3).toLowerCase()) {
+        switch (date.split(' ')[1].substr(0, 3).toLowerCase()) {
             case 'gen':
                 dateMM = '01';
                 break;
@@ -61,9 +61,9 @@ function toDateTime(str) {
                 dateMM = '12';
                 break;
         }
-        obj.date = dateMM + '/' + date.substr(0, 2) + '/' + date.substr(7, 4);
+        obj.date = dateMM + '/' + date.substr(0, 2) + '/' + date.substr(-4);
         obj.time = str.substr(-5);
-    } else {
+    } else if (str.length > 6) {
         //like: gio 09:37 or Giovedì 10:17
         let date = str.split(' ')[0].substr(0, 3).toLowerCase()
         let now = new Date();
@@ -100,6 +100,11 @@ function toDateTime(str) {
         now = new Date(Date.now() - weekDay * 86400000);
         obj.date = ("0" + (now.getMonth() + 1)).slice(-2) + '/' + ("0" + (now.getDate())).slice(-2) + '/' + now.getFullYear();
         obj.time = str.split(' ')[1]
+    } else {
+        // Like: 00:59
+        let now = new Date();
+        obj.date = ("0" + (now.getMonth() + 1)).slice(-2) + '/' + ("0" + (now.getDate())).slice(-2) + '/' + now.getFullYear();
+        obj.time = str.trim();
     }
     return obj;
 }

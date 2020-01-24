@@ -84,7 +84,7 @@ async function extractChatInfo(page, chatMsgs) {
         })
     } catch (e) {
         //if it throws error usually is because a like emoticon has been sent
-        text = '<emoticon>';
+        text = 'emoticon';
     }
     console.log('>>> First message text: ' + text);
     data.subject = text;
