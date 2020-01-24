@@ -21,10 +21,10 @@ function rowToCsv(name, subject, bf, firstMsgTime, responseTime) {
         Sherpa_CAT_2: '',
         N_Subject: '',
         BF: bf,
-        Request_Date: '',
-        Request_Time: '',
-        Response_Day: '',
-        Response_Time: '',
+        Request_Date: Utils.toDateTime(firstMsgTime).date,
+        Request_Time: Utils.toDateTime(firstMsgTime).time,
+        Response_Day: Utils.toDateTime(responseTime).date,
+        Response_Time: Utils.toDateTime(responseTime).time,
         Time_to_Response: '',
         Notes: ''
     });
