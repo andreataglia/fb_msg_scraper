@@ -10,7 +10,7 @@ let csvObj = {
 function rowToCsv(name, subject, bf, firstMsgTime, responseTime) {
     csvObj.data.push({
         Name: name,
-        Subject: subject,
+        Subject: subject.replace(/<\/?[^>]+(>|$)/g, ""),
         Weeks_from_D: '',
         Macro_Activities_Survey: '',
         Macro_Activities_Actual: '',
@@ -30,7 +30,7 @@ function rowToCsv(name, subject, bf, firstMsgTime, responseTime) {
     });
 }
 
-function printCsv(){
+function printCsv() {
     CsvFile.printCsv(csvObj);
 }
 

@@ -1,7 +1,7 @@
 //Conf Vars
-const CHATS_TO_SCRAPE = 2;
+const CHATS_TO_SCRAPE = 20;
 const CHATS_TO_SKIP = 5;
-const CHATS_IN_PRINCIPLE = 5;
+const CHATS_IN_PRINCIPLE = 3;
 
 //Utils Functions
 function delay(time) {
@@ -19,9 +19,9 @@ function toDateTime(str) {
         date: '??',
         time: '??'
     }
-    if (str.split(',').length > 1) {
+    if (str.length > 15) {
         //like: 14 GEN 2020, 22:30
-        let date = str.split(',')[0]
+        let date = str.substr(0, str.length - 6);
         let dateMM = '';
         switch (date.substr(3, 3).toLowerCase()) {
             case 'gen':
@@ -33,9 +33,36 @@ function toDateTime(str) {
             case 'mar':
                 dateMM = '03';
                 break;
+            case 'apr':
+                dateMM = '04';
+                break;
+            case 'mag':
+                dateMM = '05';
+                break;
+            case 'giu':
+                dateMM = '06';
+                break;
+            case 'lug':
+                dateMM = '07';
+                break;
+            case 'ago':
+                dateMM = '08';
+                break;
+            case 'set':
+                dateMM = '09';
+                break;
+            case 'ott':
+                dateMM = '10';
+                break;
+            case 'nov':
+                dateMM = '11';
+                break;
+            case 'dic':
+                dateMM = '12';
+                break;
         }
         obj.date = dateMM + '/' + date.substr(0, 2) + '/' + date.substr(7, 4);
-        obj.time = str.split(',')[1].trim();
+        obj.time = str.substr(-5);
     } else {
         //like: gio 09:37 or Giovedì 10:17
         let date = str.split(' ')[0].substr(0, 3).toLowerCase()

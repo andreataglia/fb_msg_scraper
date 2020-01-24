@@ -101,8 +101,8 @@ const Utils = require('./utils.js');
     while (moreChats) {
         //Open specific chat
         try {
-            await page.hover(Utils.divChild(chatList, Utils.CHATS_IN_PRINCIPLE));
-            await page.click(Utils.divChild(chatList, Utils.CHATS_IN_PRINCIPLE), {
+            await page.hover(Utils.divChild(chatList, Utils.CHATS_IN_PRINCIPLE + 1));
+            await page.click(Utils.divChild(chatList, Utils.CHATS_IN_PRINCIPLE + 1), {
                 delay: 200
             });
             await page.waitForSelector(chatMsgs);
