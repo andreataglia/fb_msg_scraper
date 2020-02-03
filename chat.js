@@ -97,7 +97,7 @@ async function extractChatInfo(page, chatMsgs) {
     let isVISmsg = false;
     i = 3;
     //Search for _. cannot have more than 20 messages without finding the right response
-    while (!isVISmsg && i < 20) {
+    while (!isVISmsg && i < 10) {
         try {
             let element = await page.$eval(Utils.divChild(chatMsgs, i), (el) => {
                 return el.innerHTML
@@ -148,7 +148,11 @@ async function extractChatInfo(page, chatMsgs) {
     console.log('>>> B/F: ' + bf);
     data.bf = bf;
 
-    rowToCsv(data.name, data.subject, data.bf, data.firstMsgTime, data.responseTime);
+    try{
+        rowToCsv(data.name, data.subject, data.bf, data.firstMsgTime, data.responseTime);
+    }catch(e){
+        console.log('WARNING: Skipping chat because of :' + e);
+    }
 }
 
 

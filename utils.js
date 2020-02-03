@@ -1,7 +1,7 @@
 //Conf Vars
-const CHATS_TO_SCRAPE = 20;
+const CHATS_TO_SCRAPE = 300;
 const CHATS_TO_SKIP = 5;
-const CHATS_IN_PRINCIPLE = 3;
+const CHATS_IN_PRINCIPLE = 4;
 
 //Utils Functions
 function delay(time) {
@@ -19,7 +19,13 @@ function toDateTime(str) {
         date: '??',
         time: '??'
     }
-    if (str.length > 15) {
+    if(str.split('/').length > 2){
+        //like: 31/12/19, 16:28
+        str = str.split('/');
+        obj.date = str[1] + '/' + str[0] + '/20' + str[2].substr(0,2);
+        obj.time = str[2].substr(-5);
+    }
+    else if (str.length > 15) {
         //like: 14 GEN 2020, 22:30 or 14 gennaio 2020 22:30 
         let date = str.substr(0, str.length - 6);
         let dateMM = '';

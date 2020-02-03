@@ -64,25 +64,30 @@ const Utils = require('./utils.js');
     let i = 0;
     const chatMsgs = "#u_0_u > div > div > div > table > tbody > tr > td._3q3y._51mw._51m-.vTop > div > div._6skv._4bl9 > div._2evr > div > div:nth-child(1) > div > div > div.uiScrollableAreaWrap.scrollable > div > div > div > div > div";
     const spostaInPrincipale = "#u_0_u > div > div > div > table > tbody > tr > td._3q3y._51mw._51m-.vTop > div > div._6skv._4bl9 > div._2evs > div > div > div:nth-child(3) > div > div._suc._stx._5bpf";
-    while (i < Utils.CHATS_TO_SCRAPE) {
-        //Open specific chat
-        try {
-            await page.hover(Utils.divChild(chatList, Utils.CHATS_TO_SKIP));
-            await page.click(Utils.divChild(chatList, Utils.CHATS_TO_SKIP), {
+    try {
+        while (i < Utils.CHATS_TO_SCRAPE) {
+            //Open specific chat
+            try {
+                await page.hover(Utils.divChild(chatList, Utils.CHATS_TO_SKIP));
+                await page.click(Utils.divChild(chatList, Utils.CHATS_TO_SKIP), {
+                    delay: 200
+                });
+            } catch (err) {
+                console.error('couldn\'t click on chat list item >>>> ' + err);
+            }
+            await page.waitForSelector(chatMsgs);
+            await page.waitForSelector(spostaInPrincipale);
+            console.log('Chat ' + i + ' ------------------------------->')
+            await Chat.extractChatInfo(page, chatMsgs);
+            //put chat into Principale once scraped
+            await page.click(spostaInPrincipale, {
                 delay: 200
-            });
-        } catch (err) {
-            console.error('couldn\'t click on chat list item >>>> ' + err);
+            })
+            i++;
         }
-        await page.waitForSelector(chatMsgs);
-        await page.waitForSelector(spostaInPrincipale);
-        console.log('Chat ' + i + ' ------------------------------->')
-        await Chat.extractChatInfo(page, chatMsgs);
-        //put chat into Principale once scraped
-        await page.click(spostaInPrincipale, {
-            delay: 200
-        })
-        i++;
+    } catch (e) {
+        //whatever happens put chats back in Archivio
+        console.log('WARNING: ended scraping in unexpected way. It will continue putting chats back into Principale. Error: ' + e);
     }
 
     //once finished scraping put the conversations back into Archive
