@@ -5,7 +5,7 @@ const CHATS_IN_PRINCIPLE = 4;
 
 //Utils Functions
 function delay(time) {
-    return new Promise(function (resolve) {
+    return new Promise(function(resolve) {
         setTimeout(resolve, time)
     });
 }
@@ -19,13 +19,12 @@ function toDateTime(str) {
         date: '??',
         time: '??'
     }
-    if(str.split('/').length > 2){
+    if (str.split('/').length > 2) {
         //like: 31/12/19, 16:28
         str = str.split('/');
-        obj.date = str[1] + '/' + str[0] + '/20' + str[2].substr(0,2);
+        obj.date = str[1] + '/' + str[0] + '/20' + str[2].substr(0, 2);
         obj.time = str[2].substr(-5);
-    }
-    else if (str.length > 15) {
+    } else if (str.length > 15) {
         //like: 14 GEN 2020, 22:30 or 14 gennaio 2020 22:30 
         let date = str.substr(0, str.length - 6);
         let dateMM = '';
@@ -67,7 +66,9 @@ function toDateTime(str) {
                 dateMM = '12';
                 break;
         }
-        obj.date = dateMM + '/' + date.substr(0, 2) + '/' + date.substr(-4);
+        let dateDD = date.split(' ')[0];
+        dateDD = dateDD.length > 1 ? dateDD : "0" + dateDD;
+        obj.date = dateMM + '/' + dateDD + '/' + date.split(' ')[2].substr(0, 4);
         obj.time = str.substr(-5);
     } else if (str.length > 6) {
         //like: gio 09:37 or Giovedì 10:17
@@ -114,6 +115,7 @@ function toDateTime(str) {
     }
     return obj;
 }
+
 
 exports.delay = delay;
 exports.divChild = divChild;

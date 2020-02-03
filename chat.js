@@ -38,9 +38,10 @@ function isOurNonAutomaticMsg(el) {
     if (el.includes('data-tooltip-position="right"')) {
         let words = el.substr(250);
         words = words.substr(words.indexOf("aria-label=\"") + 12);
+        let nameLengthShifter = words.split(',')[0].split(' ').length;
         words = words.split(' ');
         //check the message is not the automatic one
-        if (words[10] == 'disponibili,' && words[5] == 'contattato.') {
+        if (words[8 + nameLengthShifter] == 'disponibili,' && words[3 + nameLengthShifter] == 'contattato.') {
             return false;
         } else {
             return true;
